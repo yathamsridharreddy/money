@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daily Earner OS — A free system that turns daily actions into daily money</title>
+<meta name="description" content="A zero-investment daily income operating system: pick real earning methods, get a daily action plan, track every rupee, and compound results." />
+<style>
+  :root{
+    --bg:#0e1116;
+    --panel:#151a22;
+    --panel-2:#1b2230;
+    --line:#252d3b;
+    --txt:#e8edf5;
+    --muted:#98a4b8;
+    --accent:#ffb703;
+    --accent-2:#22d3a6;
+    --accent-3:#7c9cff;
+    --danger:#ff6b6b;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  html[data-theme="light"]{
+    --bg:#f6f7fb;
+    --panel:#ffffff;
+    --panel-2:#f1f4f9;
+    --line:#e2e7f0;
+    --txt:#121722;
+    --muted:#5c6779;
+    --shadow:0 10px 25px rgba(20,30,60,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Inter,system-ui,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-3)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+  /* ---------- Header ---------- */
+  header.top{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em;font-size:17px}
+  .logo .mark{
+    width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),#ff7a00);color:#201400;font-weight:900;font-size:16px;
+    box-shadow:0 4px 14px rgba(255,183,3,.35);
+  }
+  .spacer{flex:1}
+  .btn{
+    border:1px solid var(--line);background:var(--panel-2);color:var(--txt);
+    padding:8px 13px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;
+    transition:.15s transform,.15s background,.15s border;
+  }
+  .btn:hover{transform:translateY(-1px);border-color:var(--accent)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),#ff9500);color:#201500;border-color:transparent}
+  .btn.ghost{background:transparent}
+  .btn.sm{padding:5px 10px;font-size:12.5px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  /* ---------- Hero ---------- */
+  .hero{
+    border-radius:22px;overflow:hidden;border:1px solid var(--line);margin-top:22px;
+    background:linear-gradient(135deg,#182031,#0f1520 60%);
+    box-shadow:var(--shadow);
+  }
+  html[data-theme="light"] .hero{background:linear-gradient(135deg,#fff7e6,#eef4ff 60%)}
+  .hero-grid{display:grid;grid-template-columns:1.25fr .95fr;gap:0}
+  @media(max-width:880px){.hero-grid{grid-template-columns:1fr}}
+  .hero-copy{padding:30px 32px}
+  .kicker{
+    display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 14%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);
+    padding:5px 11px;border-radius:999px;margin-bottom:14px;
+  }
+  h1{font-size:clamp(28px,4.4vw,44px);line-height:1.08;margin:0 0 12px;letter-spacing:-.03em}
+  h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent),#ff7a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);font-size:16px;max-width:56ch;margin:0 0 18px}
+  .hero-art{min-height:240px;position:relative;background-size:cover;background-position:center;background-repeat:no-repeat}
+  @media(max-width:880px){.hero-art{min-height:170px;order:-1}}
+  .stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .stat{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;min-width:120px;
+  }
+  .stat b{display:block;font-size:22px;letter-spacing:-.02em}
+  .stat span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+  /* ---------- Tabs ---------- */
+  nav.tabs{display:flex;gap:6px;overflow:auto;margin:26px 0 18px;padding-bottom:6px;scrollbar-width:thin}
+  nav.tabs button{
+    white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--muted);
+    padding:9px 15px;border-radius:999px;font-size:13.5px;font-weight:650;cursor:pointer;transition:.15s
+  }
+  nav.tabs button:hover{color:var(--txt)}
+  nav.tabs button.active{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+  /* ---------- Panels ---------- */
+  .view{display:none;animation:fade .25s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:960px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:680px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card h3{margin:0 0 4px;font-size:16px;letter-spacing:-.01em}
+  .card .hint{color:var(--muted);font-size:13px;margin:0 0 14px}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .sep{height:1px;background:var(--line);margin:16px 0}
+  /* ---------- Reality strip ---------- */
+  .truth{
+    margin-top:16px;border:1px dashed color-mix(in srgb,var(--accent) 40%,var(--line));
+    background:color-mix(in srgb,var(--accent) 7%,var(--panel));
+    border-radius:14px;padding:12px 16px;font-size:13.5px;color:var(--txt)
+  }
+  .truth b{color:var(--accent)}
+  /* ---------- Progress ---------- */
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line)}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent));border-radius:999px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  /* ---------- Method cards ---------- */
+  .method{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+    display:flex;flex-direction:column;gap:10px;transition:.18s
+  }
+  .method:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:var(--shadow)}
+  .method .mtop{display:flex;gap:12px;align-items:flex-start}
+  .method .ico{font-size:26px;line-height:1}
+  .method h4{margin:0;font-size:15.5px}
+  .method .tag{font-size:11.5px;color:var(--accent-2);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .method p{margin:0;font-size:13.5px;color:var(--muted)}
+  .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px}
+  .meta div{background:var(--panel-2);border-radius:9px;padding:7px 9px;border:1px solid var(--line)}
+  .meta span{display:block;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+  .meta b{font-size:13px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:11.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
+  details.steps summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--accent-3)}
+  details.steps ol{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--muted)}
+  details.steps ol li{margin-bottom:5px}
+  /* ---------- Checklist ---------- */
+  .task{
+    display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;
+    background:var(--panel-2);border:1px solid var(--line);margin-bottom:9px;transition:.15s
+  }
+  .task:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+  .task.done{opacity:.55}
+  .task.done .t-txt{text-decoration:line-through}
+  .checkbox{
+    flex:0 0 22px;height:22px;border-radius:7px;border:2px solid var(--line);background:transparent;
+    cursor:pointer;display:grid;place-items:center;margin-top:1px;padding:0
+  }
+  .task.done .checkbox{background:var(--accent-2);border-color:var(--accent-2);color:#04231b;font-weight:900}
+  .t-txt{font-size:14px}
+  .t-tag{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  /* ---------- Table ---------- */
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  input,select,textarea{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--txt);
+    border-radius:10px;padding:9px 11px;font-size:14px;font-family:inherit;width:100%
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  label.f{display:block;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .field{margin-bottom:12px}
+  /* ---------- Heatmap ---------- */
+  .heat{display:flex;gap:3px;flex-wrap:wrap}
+  .heat i{width:13px;height:13px;border-radius:3px;background:var(--panel-2);border:1px solid var(--line);display:block}
+  /* ---------- Misc ---------- */
+  .pill{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);font-weight:600}
+  .pill.good{color:var(--accent-2);border-color:color-mix(in srgb,var(--accent-2) 40%,var(--line))}
+  .pill.warn{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+  .pill.bad{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 40%,var(--line))}
+  .note{font-size:12.5px;color:var(--muted)}
+  .canvas-box{position:relative;width:100%;height:220px}
+  canvas{width:100%;height:100%;display:block}
+  footer{color:var(--muted);font-size:12.5px;text-align:center;padding:30px 20px 0;border-top:1px solid var(--line);margin-top:40px}
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);
+    background:var(--txt);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:13.5px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:99;box-shadow:var(--shadow)
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .big-num{font-size:30px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .strike{color:var(--danger)}
+  .ok{color:var(--accent-2)}
+  ul.tight{margin:8px 0 0;padding-left:18px;font-size:13.5px;color:var(--muted)}
+  ul.tight li{margin-bottom:6px}
+  code{background:var(--panel-2);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font-size:12.5px}
+  @media print{nav.tabs,header.top,.btn{display:none!important}.view{display:block!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="logo"><span class="mark">₹</span> Daily Earner <span style="color:var(--muted);font-weight:600">OS</span></div>
+    <div class="spacer"></div>
+    <button class="btn ghost sm" id="themeBtn" title="Toggle light / dark">◐ Theme</button>
+    <button class="btn sm" id="exportBtn">⬇ Backup</button>
+    <button class="btn sm" id="importBtn">⬆ Restore</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none" />
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="kicker">◆ Zero investment · Zero hype</span>
+        <h1>Turn <em>one focused hour a day</em> into a daily income habit.</h1>
+        <p class="sub">
+          A website cannot print money. But a <strong>system</strong> can — one that tells you exactly what to do
+          this morning, tracks every rupee you collect, and compounds the wins. This is that system. It runs
+          entirely in your browser, costs nothing, and keeps your data on your device.
+        </p>
+        <div class="row">
+          <button class="btn primary" id="ctaPlan">⚡ Generate today's plan</button>
+          <button class="btn" id="ctaLog">+ Log earnings</button>
+          <button class="btn ghost" id="ctaMethods">Browse methods</button>
+        </div>
+        <div class="stat-row" id="heroStats"></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 420 340" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block">
+          <defs>
+            <linearGradient id="gBar" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0" stop-color="#ffb703" stop-opacity=".35"/>
+              <stop offset="1" stop-color="#ffb703"/>
+            </linearGradient>
+            <linearGradient id="gMint" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#22d3a6"/>
+              <stop offset="1" stop-color="#7c9cff"/>
+            </linearGradient>
+            <radialGradient id="gGlow" cx="50%" cy="45%" r="55%">
+              <stop offset="0" stop-color="#ffb703" stop-opacity=".28"/>
+              <stop offset="1" stop-color="#ffb703" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity=".35"/>
+            </filter>
+          </defs>
+
+          <circle cx="215" cy="150" r="170" fill="url(#gGlow)"/>
+
+          <!-- back card: calendar streak -->
+          <g filter="url(#soft)">
+            <rect x="42" y="42" width="150" height="112" rx="16" fill="var(--panel-2)" stroke="var(--line)"/>
+            <rect x="42" y="42" width="150" height="30" rx="16" fill="var(--panel-2)"/>
+            <rect x="56" y="52" width="52" height="8" rx="4" fill="#7c9cff" opacity=".8"/>
+            <g fill="#22d3a6" opacity=".95">
+              <rect x="58"  y="86"  width="18" height="18" rx="5"/>
+              <rect x="82"  y="86"  width="18" height="18" rx="5"/>
+              <rect x="106" y="86"  width="18" height="18" rx="5" opacity=".45"/>
+              <rect x="130" y="86"  width="18" height="18" rx="5" opacity=".45"/>
+              <rect x="154" y="86"  width="22" height="18" rx="5" opacity=".25"/>
+              <rect x="58"  y="110" width="18" height="18" rx="5"/>
+              <rect x="82"  y="110" width="18" height="18" rx="5"/>
+              <rect x="106" y="110" width="18" height="18" rx="5" opacity=".45"/>
+              <rect x="130" y="110" width="18" height="18" rx="5" opacity=".25"/>
+            </g>
+            <path d="M158 118c4-6 8-4 8 2 0 5-4 7-8 11-4-4-8-6-8-11 0-6 4-8 8-2z" fill="#ffb703"/>
+          </g>
+
+          <!-- laptop / dashboard -->
+          <g filter="url(#soft)">
+            <rect x="120" y="132" width="248" height="150" rx="14" fill="var(--panel)" stroke="var(--line)"/>
+            <rect x="120" y="132" width="248" height="26" rx="14" fill="var(--panel-2)"/>
+            <circle cx="136" cy="145" r="4" fill="#ff6b6b" opacity=".9"/>
+            <circle cx="150" cy="145" r="4" fill="#ffb703" opacity=".9"/>
+            <circle cx="164" cy="145" r="4" fill="#22d3a6" opacity=".9"/>
+            <rect x="180" y="140" width="90" height="9" rx="4.5" fill="var(--line)"/>
+            <!-- bars -->
+            <rect x="140" y="225" width="20" height="34" rx="5" fill="url(#gBar)"/>
+            <rect x="168" y="210" width="20" height="49" rx="5" fill="url(#gBar)"/>
+            <rect x="196" y="188" width="20" height="71" rx="5" fill="url(#gBar)"/>
+            <rect x="224" y="200" width="20" height="59" rx="5" fill="url(#gBar)"/>
+            <rect x="252" y="166" width="20" height="93" rx="5" fill="#ffb703"/>
+            <rect x="280" y="180" width="20" height="79" rx="5" fill="url(#gBar)"/>
+            <rect x="308" y="152" width="20" height="107" rx="5" fill="#22d3a6"/>
+            <!-- trend line -->
+            <path d="M150 222 L178 207 L206 185 L234 197 L262 163 L290 177 L318 149"
+                  fill="none" stroke="#ffb703" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".95"/>
+            <path d="M318 152 l14-12 v34 h-30 z" fill="var(--panel-2)" stroke="var(--line)"/>
+            <path d="M322 146 l6-6 -6-6 M332 146 l-6-6 6-6" stroke="#22d3a6" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <rect x="140" y="264" width="188" height="6" rx="3" fill="var(--line)"/>
+          </g>
+
+          <!-- rupee coin -->
+          <g filter="url(#soft)">
+            <circle cx="86" cy="228" r="40" fill="url(#gMint)"/>
+            <circle cx="86" cy="228" r="33" fill="#0f1520" opacity=".18"/>
+            <text x="86" y="241" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="34"
+                  font-weight="800" fill="#ffb703" text-anchor="middle">₹</text>
+          </g>
+
+          <!-- checklist card -->
+          <g filter="url(#soft)">
+            <rect x="242" y="36" width="146" height="78" rx="14" fill="var(--panel-2)" stroke="var(--line)"/>
+            <circle cx="264" cy="60" r="8" fill="#22d3a6"/>
+            <path d="M261 60 l2.5 2.5 4-5" stroke="#04231b" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <rect x="280" y="56" width="86" height="8" rx="4" fill="var(--line)"/>
+            <circle cx="264" cy="86" r="8" fill="#22d3a6"/>
+            <path d="M261 86 l2.5 2.5 4-5" stroke="#04231b" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <rect x="280" y="82" width="66" height="8" rx="4" fill="var(--line)"/>
+            <rect x="352" y="82" width="14" height="8" rx="4" fill="#ffb703" opacity=".7"/>
+          </g>
+
+          <!-- sparkles -->
+          <g fill="#ffb703" opacity=".85">
+            <circle cx="206" cy="30" r="3"/>
+            <circle cx="392" cy="130" r="2.5"/>
+            <circle cx="30"  cy="300" r="2.5"/>
+            <circle cx="356" cy="308" r="3"/>
+          </g>
+          <g fill="#7c9cff" opacity=".8">
+            <circle cx="118" cy="18" r="2.5"/>
+            <circle cx="404" cy="252" r="2.5"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <div class="truth" id="truthStrip"></div>
+
+  <!-- TABS -->
+  <nav class="tabs" id="tabs">
+    <button data-view="dash" class="active">📊 Dashboard</button>
+    <button data-view="plan">✅ Today's Plan</button>
+    <button data-view="methods">🧭 Methods</button>
+    <button data-view="tracker">💰 Tracker</button>
+    <button data-view="calc">📈 Projections</button>
+    <button data-view="publish">🚀 Publish &amp; Earn</button>
+    <button data-view="guard">🛡 Scam Radar</button>
+  </nav>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section class="view active" id="view-dash">
+    <div class="grid g4" style="margin-bottom:16px">
+      <div class="card"><span class="pill warn">Today</span><div class="big-num" id="sToday" style="margin-top:8px">₹0</div><div class="note">logged today</div></div>
+      <div class="card"><span class="pill good">This month</span><div class="big-num" id="sMonth" style="margin-top:8px">₹0</div><div class="note" id="sMonthNote">vs goal ₹30,000</div></div>
+      <div class="card"><span class="pill">Streak</span><div class="big-num" id="sStreak" style="margin-top:8px">0 <span style="font-size:15px;color:var(--muted)">days</span></div><div class="note">consistent action</div></div>
+      <div class="card"><span class="pill">All time</span><div class="big-num" id="sAll" style="margin-top:8px">₹0</div><div class="note" id="sAllNote">across 0 entries</div></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Monthly goal progress</h3>
+        <p class="hint" id="goalLabel">Goal: ₹30,000 / month</p>
+        <div class="bar"><i id="goalBar" style="width:0%"></i></div>
+        <div class="row" style="margin-top:12px">
+          <div class="field" style="flex:1;min-width:140px;margin:0">
+            <label class="f">Monthly goal (₹)</label>
+            <input type="number" id="goalInput" min="0" step="500" />
+          </div>
+          <div class="field" style="flex:1;min-width:140px;margin:0">
+            <label class="f">Days left to hit it</label>
+            <input id="daysLeft" disabled style="opacity:.8" />
+          </div>
+        </div>
+        <p class="note" id="paceNote" style="margin-top:12px"></p>
+      </div>
+
+      <div class="card">
+        <h3>Last 30 days</h3>
+        <p class="hint">Daily earnings — the only graph that matters.</p>
+        <div class="canvas-box"><canvas id="chart30"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card">
+        <h3>Where your money comes from</h3>
+        <p class="hint">Double down on the biggest slice.</p>
+        <div class="canvas-box" style="height:200px"><canvas id="chartPie"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Consistency heatmap</h3>
+        <p class="hint">Last 12 weeks — a filled square means you logged or acted that day.</p>
+        <div class="heat" id="heat"></div>
+        <div class="sep"></div>
+        <h3 style="margin-bottom:8px">Insights</h3>
+        <ul class="tight" id="insights"></ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="row" style="justify-content:space-between">
+        <div><h3>Recent entries</h3><p class="hint">Your last 8 logged earnings.</p></div>
+        <button class="btn sm" id="seedBtn" title="Add sample data to explore the dashboard">✨ Load sample data</button>
+      </div>
+      <div style="overflow:auto"><table id="recentTable"></table></div>
+    </div>
+  </section>
+
+  <!-- ================= PLAN ================= -->
+  <section class="view" id="view-plan">
+    <div class="card">
+      <h3>Your active earning stack</h3>
+      <p class="hint">Pick 2–3 methods. Focus beats spreading yourself across ten.</p>
+      <div class="chips" id="stackChips" style="margin-bottom:14px"></div>
+      <div class="row">
+        <div class="field" style="flex:1;min-width:200px;margin:0">
+          <label class="f">Add a method</label>
+          <select id="methodSelect"></select>
+        </div>
+        <div class="field" style="flex:0 0 150px;margin:0">
+          <label class="f">Minutes available</label>
+          <input type="number" id="minutesInput" value="60" min="10" max="600" step="10" />
+        </div>
+        <button class="btn primary" id="genBtn" style="margin-top:18px">Generate plan</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px">
+        <div>
+          <h3 id="planDate">Today's actions</h3>
+          <p class="hint" id="planSub">Complete every action to keep your streak alive.</p>
+        </div>
+        <div style="text-align:right">
+          <div class="big-num" id="planPct" style="font-size:24px">0%</div>
+          <div class="note">done</div>
+        </div>
+      </div>
+      <div class="bar" style="margin-bottom:16px"><i id="planBar" style="width:0%"></i></div>
+      <div id="taskList"></div>
+      <div class="sep"></div>
+      <div class="row">
+        <button class="btn primary" id="allDoneBtn">✓ Mark all done</button>
+        <button class="btn" id="regenBtn">🔄 Shuffle tasks</button>
+        <button class="btn ghost" id="clearPlanBtn">Reset today</button>
+      </div>
+      <p class="note" style="margin-top:12px">
+        Streak rule: finishing <strong>at least 60% of the day's actions</strong> counts as a completed day. Partial credit keeps you moving.
+      </p>
+    </div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card">
+        <h3>The daily loop</h3>
+        <p class="hint">Run this every single day for 90 days. That is the whole secret.</p>
+        <ol class="tight" style="font-size:14px;color:var(--txt)">
+          <li><b>Ask (10 min):</b> send 5 pitches / applications / messages. Income follows volume of asks.</li>
+          <li><b>Build (30 min):</b> work on the asset that compounds — a gig, a video, a product, a portfolio.</li>
+          <li><b>Publish (10 min):</b> ship something visible. Unpublished work earns nothing.</li>
+          <li><b>Log (2 min):</b> record money in, money out, and what you learned.</li>
+          <li><b>Review (5 min weekly):</b> kill what's dead, double what converts.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>Why most people earn ₹0</h3>
+        <ul class="tight">
+          <li><b class="strike">Chasing the perfect method</b> for 6 months instead of testing one for 6 days.</li>
+          <li><b class="strike">Consuming instead of shipping</b> — tutorials feel productive; finished work pays.</li>
+          <li><b class="strike">Quitting in the valley</b> — weeks 2–6 are where 90% stop, right before traction.</li>
+          <li><b class="ok">What works:</b> one method + a daily number of asks + logging everything.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= METHODS ================= -->
+  <section class="view" id="view-methods">
+    <div class="card" style="margin-bottom:16px">
+      <h3>12 ways to earn with ₹0 upfront</h3>
+      <p class="hint">
+        Every method below needs no money to start — only time and repetition. Ranges are realistic
+        <em>after</em> the setup period, not on day one. Tap <b>Add to stack</b> to wire a method into your daily plan.
+      </p>
+      <div class="row">
+        <span class="pill good">⚡ Fast cash: same week</span>
+        <span class="pill warn">🌱 Compounding: 30–90 days</span>
+        <span class="pill">🧠 Skill-based</span>
+      </div>
+    </div>
+    <div class="grid g3" id="methodGrid"></div>
+  </section>
+
+  <!-- ================= TRACKER ================= -->
+  <section class="view" id="view-tracker">
+    <div class="grid g2">
+      <div class="card">
+        <h3>Log money in</h3>
+        <p class="hint">Log the day you earned it, not the day it hit your bank.</p>
+        <div class="grid g2">
+          <div class="field"><label class="f">Date</label><input type="date" id="logDate" /></div>
+          <div class="field"><label class="f">Amount (₹)</label><input type="number" id="logAmt" placeholder="e.g. 750" min="0" step="10" /></div>
+        </div>
+        <div class="field"><label class="f">Method</label><select id="logMethod"></select></div>
+        <div class="field"><label class="f">Note (optional)</label><input id="logNote" placeholder="Client: logo design for X" /></div>
+        <button class="btn primary" id="addLogBtn">Add entry</button>
+      </div>
+
+      <div class="card">
+        <h3>Monthly breakdown</h3>
+        <p class="hint">Totals per month across all methods.</p>
+        <div style="overflow:auto;max-height:230px"><table id="monthTable"></table></div>
+        <div class="sep"></div>
+        <div class="row">
+          <button class="btn" id="csvBtn">⬇ Export CSV</button>
+          <button class="btn ghost" id="wipeBtn">🗑 Clear all data</button>
+        </div>
+        <p class="note" id="storageNote" style="margin-top:10px"></p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="row" style="justify-content:space-between">
+        <div><h3>All entries</h3><p class="hint" id="logCount">0 entries</p></div>
+        <select id="filterMethod" style="max-width:220px"></select>
+      </div>
+      <div style="overflow:auto"><table id="logTable"></table></div>
+    </div>
+  </section>
+
+  <!-- ================= CALCULATOR ================= -->
+  <section class="view" id="view-calc">
+    <div class="grid g2">
+      <div class="card">
+        <h3>Projection calculator</h3>
+        <p class="hint">Not a promise — arithmetic. Change the inputs and watch the curve.</p>
+        <div class="field"><label class="f">Hours per day you'll really work</label><input type="number" id="cHours" value="2" min="0.5" max="12" step="0.5" /></div>
+        <div class="field"><label class="f">Effective hourly rate today (₹)</label><input type="number" id="cRate" value="250" min="0" step="25" /></div>
+        <div class="field"><label class="f">Skill growth per month (%)</label><input type="number" id="cGrowth" value="20" min="0" max="100" step="5" /></div>
+        <div class="field"><label class="f">Days worked per month</label><input type="number" id="cDays" value="26" min="1" max="31" step="1" /></div>
+        <div class="row">
+          <button class="btn primary" id="calcBtn">Calculate</button>
+          <button class="btn ghost" id="resetCalcBtn">Reset</button>
+        </div>
+        <div class="sep"></div>
+        <div class="grid g3">
+          <div><span class="pill">Month 1</span><div class="big-num" id="cM1" style="font-size:22px;margin-top:6px">₹0</div></div>
+          <div><span class="pill">Month 3</span><div class="big-num" id="cM3" style="font-size:22px;margin-top:6px">₹0</div></div>
+          <div><span class="pill good">Month 12</span><div class="big-num" id="cM12" style="font-size:22px;margin-top:6px">₹0</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>12-month curve</h3>
+        <p class="hint">Compounding comes from raising your rate, not your hours.</p>
+        <div class="canvas-box" style="height:260px"><canvas id="chartProj"></canvas></div>
+        <p class="note" id="calcVerdict" style="margin-top:12px"></p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>The honest math of "free daily money"</h3>
+      <div class="grid g3" style="margin-top:10px">
+        <div>
+          <span class="pill bad">Reality</span>
+          <ul class="tight">
+            <li>Surveys &amp; microtasks: ₹20–150/day. Real money, tiny ceiling.</li>
+            <li>MLM / "join for ₹499" schemes: you are the customer, not the earner.</li>
+            <li>"Trading bots / doubling apps": the fastest way to lose ₹10,000.</li>
+          </ul>
+        </div>
+        <div>
+          <span class="pill warn">Workable</span>
+          <ul class="tight">
+            <li>Skill services: ₹500–5,000/day once you have 3 paying clients.</li>
+            <li>Local services: cash in 24 hours, no platform needed.</li>
+            <li>Reselling / affiliate: ₹200–2,000/day with traffic.</li>
+          </ul>
+        </div>
+        <div>
+          <span class="pill good">Compounding</span>
+          <ul class="tight">
+            <li>Content + digital products: near-zero marginal cost per sale.</li>
+            <li>A website of your own: the one asset nobody can deplatform.</li>
+            <li>Email list: 1,000 subscribers can out-earn 100,000 followers.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PUBLISH ================= -->
+  <section class="view" id="view-publish">
+    <div class="card" style="margin-bottom:16px">
+      <h3>Turn this page into an asset that earns</h3>
+      <p class="hint">
+        Two ways to make money with what you're looking at: <b>(1)</b> use it as your private daily system, or
+        <b>(2)</b> publish it publicly and monetise the traffic. Here's the free path from zero to first rupee.
+      </p>
+      <div class="grid g3" style="margin-top:14px">
+        <div class="card" style="background:var(--panel-2)">
+          <span class="pill">Step 1 · Free hosting</span>
+          <ul class="tight">
+            <li><b>GitHub Pages</b> — push this folder, enable Pages, done. Free, forever, custom domain supported.</li>
+            <li><b>Netlify Drop</b> — drag the folder, get a live URL in 20 seconds.</li>
+            <li><b>Cloudflare Pages</b> — free, fast, generous bandwidth.</li>
+          </ul>
+        </div>
+        <div class="card" style="background:var(--panel-2)">
+          <span class="pill">Step 2 · Free traffic</span>
+          <ul class="tight">
+            <li><b>SEO:</b> target low-competition queries like "how to earn ₹500 daily in [your city]".</li>
+            <li><b>Answer real questions</b> on Quora, Reddit (r/IndiaInvestments, r/sidehustle), Indie Hackers — helpful answers with a link, never spam.</li>
+            <li><b>Shorts/Reels</b> showing your own daily numbers — proof beats advice.</li>
+          </ul>
+        </div>
+        <div class="card" style="background:var(--panel-2)">
+          <span class="pill">Step 3 · Monetisation</span>
+          <ul class="tight">
+            <li><b>Google AdSense</b> once you have ~30 quality posts and real traffic.</li>
+            <li><b>Affiliate:</b> Amazon Associates, Flipkart, EarnKaro, Hostinger, Canva, Notion.</li>
+            <li><b>Your own service</b> — the highest margin: sell what you now know how to do.</li>
+            <li><b>Digital product:</b> a ₹299 template/notion pack beats 10,000 ad views.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Common ways sites actually get paid</h3>
+        <div style="overflow:auto"><table>
+          <thead><tr><th>Model</th><th>First payout</th><th class="num">Realistic</th></tr></thead>
+          <tbody>
+            <tr><td>Display ads (AdSense / Mediavine)</td><td>2–6 months</td><td class="num">₹1k–50k / mo</td></tr>
+            <tr><td>Affiliate commissions</td><td>30–60 days</td><td class="num">₹2k–1L+ / mo</td></tr>
+            <tr><td>Selling a service (audit, setup, design)</td><td>Same week</td><td class="num">₹10k–2L / mo</td></tr>
+            <tr><td>Digital product / template</td><td>2–8 weeks</td><td class="num">₹5k–3L / mo</td></tr>
+            <tr><td>Paid newsletter / community</td><td>3–12 months</td><td class="num">₹10k–5L / mo</td></tr>
+            <tr><td>Sponsored posts</td><td>6–18 months</td><td class="num">₹5k–1L / post</td></tr>
+          </tbody>
+        </table></div>
+        <p class="note" style="margin-top:10px">Ranges depend entirely on traffic, niche and skill — treat them as ceilings earned over time, not starting points.</p>
+      </div>
+      <div class="card">
+        <h3>Your 30-day launch checklist</h3>
+        <ul class="tight" id="launchList"></ul>
+        <div class="sep"></div>
+        <p class="note">Tick items off here as you go — the checkboxes save automatically.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCAM RADAR ================= -->
+  <section class="view" id="view-guard">
+    <div class="card" style="margin-bottom:16px;border-color:color-mix(in srgb,var(--danger) 40%,var(--line))">
+      <h3>🛡 Scam radar — read this before you pay anyone</h3>
+      <p class="hint">
+        "Free money daily" is the most profitable lie on the internet. If an opportunity matches two or more of
+        the flags below, walk away.
+      </p>
+    </div>
+    <div class="grid g2" id="scamGrid"></div>
+    <div class="card" style="margin-top:16px">
+      <h3>The only three questions that matter</h3>
+      <ol class="tight" style="font-size:14.5px;color:var(--txt)">
+        <li><b>Who is paying, and why?</b> If you can't name the customer, there is no business.</li>
+        <li><b>Do I have to pay to start?</b> Legitimate work pays you. It doesn't invoice you.</li>
+        <li><b>Does it work without recruiting others?</b> If income depends on sign-ups, it's a pyramid.</li>
+      </ol>
+      <div class="sep"></div>
+      <p class="note">
+        This tool stores data only on your device, sells nothing, and asks for nothing. That's the standard
+        anything you use should meet.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    Daily Earner OS · a free, offline-first system · your data never leaves this browser<br />
+    Built as a tool, not a promise. Consistency is the only compounding interest you control.
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================================
+   Daily Earner OS — single-file, offline-first daily income system
+   ========================================================================= */
+
+/* ---------- Safe storage (works even in sandboxed iframes) ---------- */
+const store = (() => {
+  let ok = true;
+  try { localStorage.setItem('__deos', '1'); localStorage.removeItem('__deos'); }
+  catch (e) { ok = false; }
+  const mem = {};
+  return {
+    persistent: ok,
+    get(k){ try { return ok ? localStorage.getItem(k) : (mem[k] ?? null); } catch(e){ return mem[k] ?? null; } },
+    set(k,v){ try { if (ok) localStorage.setItem(k,v); else mem[k] = v; } catch(e){ mem[k] = v; } }
+  };
+})();
+
+const KEY = 'daily-earner-os/v1';
+const money = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const todayISO = () => new Date().toISOString().slice(0,10);
+const uid = () => Math.random().toString(36).slice(2,9);
+
+/* ---------- Method library ---------- */
+const METHODS = [
+  {
+    id:'freelance', icon:'💼', name:'Freelance Micro-Services', tag:'Fastest skilled cash',
+    first:'3–14 days', daily:'₹300 – ₹3,000', difficulty:'Medium', speed:'⚡ Fast',
+    blurb:'Package one repeatable skill (design, writing, editing, data, automation) as a fixed-price gig and sell it repeatedly instead of hourly.',
+    platforms:['Fiverr','Upwork','Freelancer','LinkedIn','Local WhatsApp groups'],
+    steps:[
+      'Pick ONE skill you can deliver in under 24 hours.',
+      'Write the offer as: "I will <result> in <time> for <who>."',
+      'Create 3 portfolio samples — make them up if you have no clients yet.',
+      'List it on Fiverr + pitch 10 people on LinkedIn daily for 14 days.',
+      'Overdeliver on the first 5 orders to buy reviews.'
+    ],
+    actions:[
+      'Send 5 personalised pitches (not copy-paste) to potential clients',
+      'Improve one gig: new thumbnail, clearer title, sharper promise',
+      'Deliver or over-deliver on an existing order early',
+      'Add one new portfolio sample to your profile',
+      'Follow up with 3 old leads who never replied',
+      'Raise your price by 10% on your best-performing gig'
+    ]
+  },
+  {
+    id:'local', icon:'🏍️', name:'Local / Hyperlocal Gigs', tag:'Cash within 24 hours',
+    first:'1–3 days', daily:'₹400 – ₹2,500', difficulty:'Easy', speed:'⚡ Fast',
+    blurb:'The fastest money on earth is a service performed within 5 km of you. No algorithm, no approval, no waiting.',
+    platforms:['Facebook Marketplace','OLX','Justdial','Google Business','WhatsApp status','Sulekha'],
+    steps:[
+      'List 5 things people near you hate doing (bike wash, deep cleaning, tiffin, dog walking, phone repair tuition, photography).',
+      'Post one clear offer with a price and a photo in 3 local groups.',
+      'Create a Google Business Profile — free, and it pulls local searches.',
+      'Ask every happy customer for one referral and one review.',
+      'Turn repeat customers into a weekly subscription.'
+    ],
+    actions:[
+      'Post your service offer in 3 local WhatsApp/Facebook groups',
+      'Ask 2 past customers for a Google review',
+      'Message 5 people who enquired but never booked',
+      'Add one photo or short video proof of your work',
+      'Offer a weekly/monthly plan to an existing customer',
+      'Raise prices for new customers only, and test demand'
+    ]
+  },
+  {
+    id:'tutor', icon:'🎓', name:'Online Tutoring & Answering', tag:'Use what you studied',
+    first:'7–21 days', daily:'₹300 – ₹1,500', difficulty:'Easy', speed:'⚡ Fast',
+    blurb:'If you cleared Class 10/12 or any degree subject, you can be paid to explain it — to school kids, college students, or on Q&A platforms.',
+    platforms:['Chegg India','Course Hero','Superprof','Vedantu','UrbanPro','Preply','Local tuition'],
+    steps:[
+      'Choose 2 subjects you can solve without Google.',
+      'Register on 2 platforms; pass their subject test.',
+      'Answer 20 questions to build an accepted-answer record.',
+      'Offer a free 15-minute demo class to 5 local parents.',
+      'Convert demos into a monthly batch or 1:1 classes.'
+    ],
+    actions:[
+      'Solve and submit 10 subject questions',
+      'Post a free demo-class offer in 2 local groups',
+      'Record one 5-minute explainer video and post it',
+      'Follow up with 3 students/parents who showed interest',
+      'Prepare one worksheet/handout you can reuse and sell',
+      'Ask one student for a video testimonial'
+    ]
+  },
+  {
+    id:'resell', icon:'📦', name:'Zero-Inventory Reselling', tag:'No stock, no risk',
+    first:'7–30 days', daily:'₹200 – ₹2,000', difficulty:'Easy', speed:'⚡ Fast',
+    blurb:'List other people\'s products at a margin. You never touch inventory — the supplier ships, you keep the difference.',
+    platforms:['Meesho Supplier','EarnKaro','Amazon Associates','Flipkart Affiliate','GlowRoad','Instagram Shop'],
+    steps:[
+      'Pick a narrow category (kitchen, pet, festive decor) — not "everything".',
+      'Add 30 products with honest descriptions to your storefront.',
+      'Post 2 product reels daily showing the product in use.',
+      'Share affiliate links in 5 relevant groups/pages daily.',
+      'Track which 3 products get clicks and go all-in on those.'
+    ],
+    actions:[
+      'List 10 new products with clear, benefit-led descriptions',
+      'Post 1 product demo reel/review',
+      'Share your store link in 3 relevant communities',
+      'Check which products got clicks and delete the bottom 20%',
+      'Reply to every comment / DM within 30 minutes',
+      'Negotiate a better margin with your top supplier'
+    ]
+  },
+  {
+    id:'content', icon:'🎬', name:'Short-Form Content', tag:'Audience compounds',
+    first:'30–90 days', daily:'₹0 – ₹5,000+', difficulty:'Hard', speed:'🌱 Compounding',
+    blurb:'Shorts/Reels are the last free distribution channel that still works. Money arrives from brand deals, your own product, or platform payouts.',
+    platforms:['YouTube Shorts','Instagram Reels','Facebook Reels','Moj','ShareChat'],
+    steps:[
+      'Pick one niche you can talk about for 100 videos.',
+      'Study 20 top videos in that niche; write down their hooks.',
+      'Post 1 video daily for 30 days — volume beats polish at the start.',
+      'Reuse the same idea across all platforms (edit once, post thrice).',
+      'At ~1,000 engaged followers, pitch 10 small brands with a rate card.'
+    ],
+    actions:[
+      'Script, record and post 1 piece of content',
+      'Write 5 new hooks before you sleep (steal from comments)',
+      'Repurpose today\'s video to a second platform',
+      'Reply to 20 comments on your own and others\' posts',
+      'DM 3 small brands offering a ₹2,000–5,000 collaboration',
+      'Review yesterday\'s analytics: keep the format that retained best'
+    ]
+  },
+  {
+    id:'digital', icon:'🧩', name:'Digital Products', tag:'Earn while you sleep',
+    first:'14–45 days', daily:'₹0 – ₹10,000+', difficulty:'Medium', speed:'🌱 Compounding',
+    blurb:'Build once, sell forever. Templates, trackers, presets, resumes, invoice sheets, Notion dashboards — no shipping, no inventory.',
+    platforms:['Gumroad','Payhip','Instamojo','Etsy','Notion Gallery','Your own site'],
+    steps:[
+      'Find a recurring complaint in a community you belong to.',
+      'Build the smallest thing that fixes it — ugly and useful beats pretty and useless.',
+      'Price it at ₹199–₹499 and launch it to 50 people directly.',
+      'Collect feedback, fix the top 3 friction points, relist.',
+      'Bundle 3 products at 2x the price once each sells.'
+    ],
+    actions:[
+      'Spend 30 minutes building or improving the product',
+      'Write the sales page headline — problem first, product second',
+      'DM 10 people who complained about this problem publicly',
+      'Add one FAQ entry based on a real objection you heard',
+      'Post one before/after visual of the product working',
+      'Create a free mini-version as a lead magnet'
+    ]
+  },
+  {
+    id:'aiservices', icon:'🤖', name:'AI-Assisted Services', tag:'Highest demand right now',
+    first:'5–20 days', daily:'₹500 – ₹5,000', difficulty:'Medium', speed:'⚡ Fast',
+    blurb:'Most small businesses know AI exists and have no idea how to use it. Sell the outcome: faster replies, better ads, automated reports.',
+    platforms:['LinkedIn','Local business visits','Fiverr','Upwork','BNI / local chambers'],
+    steps:[
+      'Pick one business type (clinics, real estate, boutiques, gyms, tuition centres).',
+      'Build one demo: a WhatsApp auto-reply bot or an automated invoice/report sheet.',
+      'Walk into 5 local businesses with the demo on your phone.',
+      'Charge a setup fee (₹3k–15k) plus a small monthly maintenance fee.',
+      'Productise it — same build, different logo, every client.'
+    ],
+    actions:[
+      'Build or refine one reusable AI demo/template',
+      'Message or visit 5 businesses with a specific, concrete offer',
+      'Write one short case study (even from a free pilot)',
+      'Automate one more repetitive task in your deliverable',
+      'Follow up with every lead from last week',
+      'Raise your setup fee by 20% for the next client'
+    ]
+  },
+  {
+    id:'stock', icon:'📸', name:'Stock Photos & Footage', tag:'True passive income',
+    first:'30–90 days', daily:'₹20 – ₹1,000', difficulty:'Easy', speed:'🌱 Compounding',
+    blurb:'Every photo you already clicked is inventory. Upload once, get paid per download for years.',
+    platforms:['Adobe Stock','Shutterstock Contributor','Wirestock','Pond5','Freepik Contributor'],
+    steps:[
+      'Pick 3 high-demand categories: workspaces, food, festivals, Indian street life, hands typing.',
+      'Shoot 50 clean, well-lit frames on your phone.',
+      'Upload 20 a week with 30–50 accurate keywords each.',
+      'Use Wirestock to distribute the same file to multiple agencies.',
+      'Repeat for 6 months — the library is the asset, not any single photo.'
+    ],
+    actions:[
+      'Shoot 20 new frames on a specific theme',
+      'Edit and keyword-tag 10 photos properly',
+      'Upload to at least one marketplace',
+      'Study top-downloaded images in your niche and copy the composition',
+      'Delete or re-keyword your worst-performing 10%',
+      'Shoot 3 vertical clips — vertical footage pays better'
+    ]
+  },
+  {
+    id:'surveys', icon:'📝', name:'Surveys & Micro-tasks', tag:'Small but instant',
+    first:'Same day', daily:'₹20 – ₹150', difficulty:'Easy', speed:'⚡ Fast',
+    blurb:'Honest warning: this is pocket money, not income. Use it to fill dead time, never as a plan.',
+    platforms:['ySense','Swagbucks','TimeBucks','Clickworker','Toluna','Google Opinion Rewards'],
+    steps:[
+      'Sign up on 3 platforms (never pay to join — ever).',
+      'Complete your profile fully to unlock better-matched surveys.',
+      'Cash out weekly; don\'t let balances sit.',
+      'Cap it at 30 minutes a day.',
+      'Reinvest the time you free up into a skill method above.'
+    ],
+    actions:[
+      'Complete available surveys on 2 platforms',
+      'Fill out profile questionnaires (unlocks higher-paying tasks)',
+      'Cash out any balance above the minimum',
+      'Spend 20 minutes learning a skill that pays 10x more',
+      'Track exactly how much per hour you really earned — then decide'
+    ]
+  },
+  {
+    id:'pod', icon:'👕', name:'Print-on-Demand', tag:'No inventory merch',
+    first:'14–45 days', daily:'₹0 – ₹3,000', difficulty:'Medium', speed:'🌱 Compounding',
+    blurb:'Upload designs, the supplier prints and ships on order. Works best with a niche audience (college fests, local pride, professions).',
+    platforms:['Printrove','Blinkstore','Qikink','Redbubble','Teespring'],
+    steps:[
+      'Choose a tribe, not a theme: nurses, bikers, developers, teachers.',
+      'Create 10 designs around their in-jokes and identity.',
+      'Launch with a deadline (5-day drop) to force action.',
+      'Post the product being worn — lifestyle beats flat mockups.',
+      'Retire designs that don\'t sell; double down on the winners.'
+    ],
+    actions:[
+      'Create or refine 2 designs',
+      'Post one lifestyle photo/mockup of your product',
+      'Run a limited-time drop with a clear deadline',
+      'Message 5 people in your target tribe for feedback',
+      'Pull last week\'s sales data and cut the bottom designs',
+      'Add one complementary product to the winning design'
+    ]
+  },
+  {
+    id:'blog', icon:'✍️', name:'Niche Site + Ads', tag:'Slowest, most durable',
+    first:'60–180 days', daily:'₹0 – ₹5,000', difficulty:'Hard', speed:'🌱 Compounding',
+    blurb:'Write 50 genuinely useful pages on one narrow topic. Traffic accumulates; ads and affiliate convert it while you sleep.',
+    platforms:['Blogger (free)','GitHub Pages','Hugo + Netlify','WordPress.com free'],
+    steps:[
+      'Pick a topic you know better than 90% of people, with buying intent.',
+      'List 50 questions people actually search about it.',
+      'Answer one per day, in plain language, 800+ words.',
+      'Internally link every new post to 3 older ones.',
+      'Apply for AdSense only after ~30 solid posts and real traffic.'
+    ],
+    actions:[
+      'Publish or improve one page of genuinely useful content',
+      'Add internal links from your 3 best pages to the new one',
+      'Answer 2 real questions on Reddit/Quora and link back',
+      'Improve one old post\'s title and meta description',
+      'Email 3 sites for a backlink or collaboration',
+      'Add one monetisation element (affiliate link, product, email box)'
+    ]
+  },
+  {
+    id:'microjob', icon:'🔧', name:'Skill Arbitrage', tag:'Learn ₹0, bill ₹',
+    first:'10–30 days', daily:'₹500 – ₹4,000', difficulty:'Medium', speed:'⚡ Fast',
+    blurb:'Learn a service on YouTube for free this week (Canva, basic SEO, video editing, Excel dashboards, ads setup) and bill for it next week.',
+    platforms:['Fiverr','LinkedIn','Local shops','Instagram DMs','Justdial'],
+    steps:[
+      'Choose a service a business already pays for (you just become the cheaper, faster option).',
+      'Spend 7 days learning it free; build 3 samples.',
+      'Offer the first 3 customers a heavy discount for a testimonial.',
+      'Raise to market rate once you have proof.',
+      'Hire or subcontract later once you are oversubscribed.'
+    ],
+    actions:[
+      'Complete one focused lesson and apply it immediately',
+      'Build or improve one sample piece for your portfolio',
+      'Pitch the service to 5 businesses with a specific outcome',
+      'Collect and publish one testimonial',
+      'Document your process so you can outsource it later',
+      'Raise your rate for the next client'
+    ]
+  }
+];
+
+const SCAMS = [
+  ['Pay-to-join "jobs"','Any "registration fee", "kit fee", "training fee", or "activation pack". Real employers pay you.','Leave immediately. Report the listing.'],
+  ['Money-doubling / trading bots','Guaranteed 10% daily returns, Telegram "signals", automated crypto bots.','Assume total loss. No exceptions.'],
+  ['MLM / referral-only income','Earnings come mainly from recruiting others who also pay to join.','It is a pyramid, not a business.'],
+  ['Fake "form filling" and "SMS jobs"','Classic Indian online fraud: ₹500–₹3,000 fee, then silence.','Never pay for data-entry work.'],
+  ['Unverified investment apps','Not registered with SEBI/RBI; flashy dashboards, blocked withdrawals.','Verify registration before a single rupee.'],
+  ['Upfront-fee freelance clients','They ask for a "security deposit" or wants you to pay for "software".','Genuine clients pay invoices, never ask for deposits.'],
+  ['"Get rich" courses sold by strangers','Selling you the dream of selling the dream — the only one earning is the seller.','Learn free first; pay only for a specific, verifiable skill.'],
+  ['Crypto / UPI "cashback" tasks','Small payouts first, then a large "unlock" deposit.','The advance payment is the bait.']
+];
+
+const LAUNCH = [
+  'Choose one niche and write down the exact person you help',
+  'Set up this site on GitHub Pages or Netlify (free, ~15 minutes)',
+  'Write 5 genuinely useful posts answering real questions',
+  'Create a free lead magnet (template, checklist, tracker)',
+  'Add an email capture — one simple form, no fancy stack',
+  'Publish 10 short-form videos pointing to the site',
+  'Answer 20 questions on forums with a helpful link back',
+  'Apply for one affiliate program and place links honestly',
+  'Pitch your own service to 20 people with a concrete outcome',
+  'Reach 30 published pages, then apply for AdSense',
+  'Review analytics: kill the bottom 20%, double the top 20%',
+  'Ship a paid digital product at ₹199–₹499'
+];
+
+const TRUTHS = [
+  'A website doesn\'t make money. <b>A system you run daily</b> makes money — the site just keeps you honest.',
+  '<b>Free</b> means no money in. It never means no work in. Anyone telling you otherwise is selling you something.',
+  '<b>₹0 → ₹1</b> is the hardest rupee you will ever earn. Every rupee after that is easier.',
+  'Income follows <b>the number of asks</b>, not the quality of your plan.',
+  'Weeks 2 to 6 are where 90% quit — right before compounding starts showing up.',
+  'If you can\'t name the person paying you, <b>you are the product</b>.',
+  'Track every rupee. What gets measured gets multiplied.'
+];
+
+/* ---------- State ---------- */
+const defaultState = () => ({
+  goal: 30000,
+  stack: ['freelance','local'],
+  minutes: 60,
+  logs: [],
+  streak: { count:0, last:null, best:0 },
+  activeDays: {},          // 'YYYY-MM-DD': true
+  plan: { date:null, tasks:[] },
+  launch: {},
+  theme: 'dark'
+});
+let S = load();
+
+function load(){
+  try {
+    const raw = store.get(KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  } catch(e){ return defaultState(); }
+}
+function save(){ store.set(KEY, JSON.stringify(S)); }
+
+/* ---------- Helpers ---------- */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function methodById(id){ return METHODS.find(m => m.id === id) || METHODS[0]; }
+function sumBy(fn){ return S.logs.reduce((a,l)=> a + (fn(l) ? Number(l.amount)||0 : 0), 0); }
+function monthKey(d){ return (d||'').slice(0,7); }
+function inMonth(iso){ return monthKey(iso) === monthKey(todayISO()); }
+function dateAddDays(iso, n){ const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function daysInMonth(){ const d = new Date(); return new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); }
+
+/* Deterministic pseudo-random from a seed string */
+function seeded(seedStr){
+  let h = 2166136261;
+  for(let i=0;i<seedStr.length;i++){ h ^= seedStr.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 100000) / 100000; };
+}
+
+/* ---------- Rendering: hero + stats ---------- */
+function renderHeroStats(){
+  const today = sumBy(l => l.date === todayISO());
+  const month = sumBy(l => inMonth(l.date));
+  const all = sumBy(() => true);
+  const el = document.getElementById('heroStats');
+  el.innerHTML = `
+    <div class="stat"><b>${money(today)}</b><span>Earned today</span></div>
+    <div class="stat"><b>${money(month)}</b><span>This month</span></div>
+    <div class="stat"><b>${S.streak.count || 0}🔥</b><span>Day streak</span></div>
+    <div class="stat"><b>${S.stack.length}</b><span>Active methods</span></div>`;
+}
+
+function renderTruth(){
+  const el = document.getElementById('truthStrip');
+  el.innerHTML = '💡 ' + TRUTHS[Math.floor(Math.random()*TRUTHS.length)];
+}
+
+/* ---------- Dashboard ---------- */
+function renderDash(){
+  const today = sumBy(l => l.date === todayISO());
+  const month = sumBy(l => inMonth(l.date));
+  const all = sumBy(() => true);
+  document.getElementById('sToday').textContent = money(today);
+  document.getElementById('sMonth').textContent = money(month);
+  document.getElementById('sStreak').innerHTML = (S.streak.count||0) + ' <span style="font-size:15px;color:var(--muted)">days</span>';
+  document.getElementById('sAll').textContent = money(all);
+  document.getElementById('sAllNote').textContent = 'across ' + S.logs.length + ' entries';
+  document.getElementById('sMonthNote').textContent = 'of ' + money(S.goal) + ' goal';
+  document.getElementById('goalLabel').textContent = 'Goal: ' + money(S.goal) + ' / month';
+  document.getElementById('goalInput').value = S.goal;
+
+  const pct = S.goal > 0 ? Math.min(100, (month / S.goal) * 100) : 0;
+  document.getElementById('goalBar').style.width = pct.toFixed(1) + '%';
+
+  const d = new Date();
+  const daysLeft = daysInMonth() - d.getDate() + 1;
+  document.getElementById('daysLeft').value = daysLeft + ' days';
+  const remaining = Math.max(0, S.goal - month);
+  const need = daysLeft > 0 ? remaining / daysLeft : remaining;
+  document.getElementById('paceNote').innerHTML = remaining <= 0
+    ? '<b class="ok">Goal smashed.</b> Raise it — targets that are never raised become ceilings.'
+    : 'You need <b>' + money(need) + ' / day</b> for the remaining ' + daysLeft + ' day(s) to hit ' + money(S.goal) + '.';
+
+  draw30();
+  drawPie();
+  renderHeat();
+  renderInsights();
+  renderRecent();
+}
+
+function renderHeat(){
+  const box = document.getElementById('heat');
+  const vals = [];
+  for(let i=83;i>=0;i--) vals.push(dateAddDays(todayISO(), -i));
+  let max = 1;
+  const perDay = {};
+  S.logs.forEach(l => { perDay[l.date] = (perDay[l.date]||0) + Number(l.amount||0); max = Math.max(max, perDay[l.date]); });
+  box.innerHTML = vals.map(d => {
+    const amt = perDay[d] || 0;
+    const active = S.activeDays[d];
+    let bg = 'var(--panel-2)';
+    if(amt > 0){
+      const t = Math.min(1, amt / max);
+      bg = 'color-mix(in srgb, var(--accent) ' + Math.round(15 + t*85) + '%, transparent)';
+    } else if(active){
+      bg = 'color-mix(in srgb, var(--accent-2) 35%, transparent)';
+    }
+    return '<i title="' + d + (amt ? ' — ' + money(amt) : (active ? ' — acted, no money' : ' — nothing')) + '" style="background:' + bg + '"></i>';
+  }).join('');
+}
+
+function renderInsights(){
+  const ul = document.getElementById('insights');
+  const byMethod = {};
+  S.logs.forEach(l => { byMethod[l.method] = (byMethod[l.method]||0) + Number(l.amount||0); });
+  const sorted = Object.entries(byMethod).sort((a,b)=>b[1]-a[1]);
+  const days = new Set(S.logs.map(l=>l.date)).size || 1;
+  const avg = sumBy(()=>true) / days;
+  const items = [];
+  if(sorted.length){
+    items.push('<li><b class="ok">Best earner:</b> ' + methodById(sorted[0][0]).name + ' — ' + money(sorted[0][1]) + ' (' + Math.round(sorted[0][1]/sumBy(()=>true)*100) + '% of total).</li>');
+  } else {
+    items.push('<li>No data yet. Log your first rupee — even ₹10 — to start the feedback loop.</li>');
+  }
+  items.push('<li><b>Average earning day:</b> ' + money(avg) + ' across ' + days + ' day(s) with income.</li>');
+  const proj = avg * 26;
+  items.push('<li><b>At this pace:</b> ' + money(proj) + ' / month. ' + (proj >= S.goal ? 'You are on track.' : 'Gap of ' + money(S.goal - proj) + ' — raise your rate or your volume.') + '</li>');
+  if(sorted.length > 1){
+    const worst = sorted[sorted.length-1];
+    items.push('<li><b>Consider dropping:</b> ' + methodById(worst[0]).name + ' is your weakest channel at ' + money(worst[1]) + '. Time is your only real capital.</li>');
+  }
+  items.push('<li><b>Streak:</b> ' + (S.streak.count||0) + ' day(s) now, best ever ' + (S.streak.best||0) + '. Streaks are the leading indicator; money is the lagging one.</li>');
+  ul.innerHTML = items.join('');
+}
+
+function renderRecent(){
+  const t = document.getElementById('recentTable');
+  const rows = [...S.logs].sort((a,b)=> a.date < b.date ? 1 : -1).slice(0,8);
+  if(!rows.length){ t.innerHTML = '<tr><td class="note">No entries yet. Hit <b>+ Log earnings</b> or load sample data.</td></tr>'; return; }
+  t.innerHTML = '<thead><tr><th>Date</th><th>Method</th><th>Note</th><th class="num">Amount</th></tr></thead><tbody>' +
+    rows.map(l => '<tr><td>' + l.date + '</td><td>' + methodById(l.method).icon + ' ' + methodById(l.method).name +
+      '</td><td style="color:var(--muted)">' + (l.note || '—') + '</td><td class="num"><b>' + money(l.amount) + '</b></td></tr>').join('') +
+    '</tbody>';
+}
+
+/* ---------- Charts (canvas, dependency-free) ---------- */
+function setupCanvas(id){
+  const c = document.getElementById(id);
+  const rect = c.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(320, rect.width || 400), h = rect.height || 200;
+  c.width = w*dpr; c.height = h*dpr;
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  return { ctx, w, h };
+}
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function draw30(){
+  let out; try { out = setupCanvas('chart30'); } catch(e){ return; }
+  const { ctx, w, h } = out;
+  const days = [];
+  for(let i=29;i>=0;i--) days.push(dateAddDays(todayISO(), -i));
+  const per = {};
+  S.logs.forEach(l => { if(days.includes(l.date)) per[l.date] = (per[l.date]||0) + Number(l.amount||0); });
+  const max = Math.max(100, ...Object.values(per));
+  const pad = 24, bw = (w - pad*2) / days.length;
+  ctx.strokeStyle = css('--line'); ctx.lineWidth = 1;
+  for(let g=0; g<=3; g++){
+    const y = pad + (h - pad*2) * (g/3);
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w-pad, y); ctx.stroke();
+  }
+  days.forEach((d,i) => {
+    const v = per[d] || 0;
+    const bh = (v/max) * (h - pad*2 - 10);
+    const x = pad + i*bw + bw*0.18, bwidth = bw*0.64, y = h - pad - bh;
+    const grad = ctx.createLinearGradient(0, y, 0, h-pad);
+    grad.addColorStop(0, '#ffb703'); grad.addColorStop(1, 'rgba(255,183,3,.25)');
+    ctx.fillStyle = v ? grad : css('--panel-2');
+    const r = Math.min(3, bwidth/2);
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x, y, bwidth, Math.max(2,bh), [r,r,0,0]);
+    else ctx.rect(x, y, bwidth, Math.max(2,bh));
+    ctx.fill();
+  });
+  ctx.fillStyle = css('--muted'); ctx.font = '11px system-ui';
+  ctx.fillText(money(max), 2, pad - 8);
+  ctx.fillText(days[0].slice(5), pad, h - 8);
+  ctx.fillText(days[days.length-1].slice(5), w - pad - 28, h - 8);
+}
+
+function drawPie(){
+  let out; try { out = setupCanvas('chartPie'); } catch(e){ return; }
+  const { ctx, w, h } = out;
+  const by = {};
+  S.logs.forEach(l => { by[l.method] = (by[l.method]||0) + Number(l.amount||0); });
+  const entries = Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  const total = entries.reduce((a,e)=>a+e[1],0);
+  const cx = w*0.32, cy = h/2, R = Math.min(w*0.3, h*0.42);
+  const colors = ['#ffb703','#22d3a6','#7c9cff','#ff7a5c','#c084fc','#f472b6','#34d399','#fbbf24','#60a5fa','#fb7185','#a3e635','#e879f9'];
+  if(!total){
+    ctx.strokeStyle = css('--line'); ctx.lineWidth = 14;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.stroke();
+    ctx.fillStyle = css('--muted'); ctx.font = '13px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText('No earnings yet', cx, cy + 5); ctx.textAlign = 'left';
+    return;
+  }
+  let a0 = -Math.PI/2;
+  entries.forEach((e,i) => {
+    const a1 = a0 + (e[1]/total) * Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,a0,a1); ctx.closePath();
+    ctx.fillStyle = colors[i % colors.length]; ctx.fill();
+    a0 = a1;
+  });
+  ctx.fillStyle = css('--bg');
+  ctx.beginPath(); ctx.arc(cx,cy,R*0.55,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = css('--txt'); ctx.font = 'bold 13px system-ui'; ctx.textAlign='center';
+  ctx.fillText(money(total), cx, cy+4); ctx.textAlign='left';
+  entries.slice(0,6).forEach((e,i) => {
+    const y = 26 + i*26;
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(w*0.62, y-9, 11, 11, 3) : ctx.rect(w*0.62, y-9, 11, 11); ctx.fill();
+    ctx.fillStyle = css('--txt'); ctx.font = '12px system-ui';
+    ctx.fillText(methodById(e[0]).name.slice(0,18), w*0.62 + 18, y);
+    ctx.fillStyle = css('--muted'); ctx.font = '11px system-ui';
+    ctx.fillText(Math.round(e[1]/total*100) + '%', w*0.62 + 18, y + 13);
+  });
+}
+
+function drawProjection(series){
+  let out; try { out = setupCanvas('chartProj'); } catch(e){ return; }
+  const { ctx, w, h } = out;
+  const pad = 34, max = Math.max(1, ...series);
+  ctx.strokeStyle = css('--line');
+  for(let g=0; g<=4; g++){
+    const y = pad + (h-pad*1.6) * (g/4);
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-8,y); ctx.stroke();
+  }
+  const xAt = i => pad + (w - pad - 10) * (i/(series.length-1));
+  const yAt = v => h - pad*0.8 - (v/max) * (h - pad*1.6);
+  ctx.beginPath();
+  series.forEach((v,i) => i ? ctx.lineTo(xAt(i), yAt(v)) : ctx.moveTo(xAt(i), yAt(v)));
+  ctx.lineTo(xAt(series.length-1), h - pad*0.8); ctx.lineTo(xAt(0), h - pad*0.8); ctx.closePath();
+  const g2 = ctx.createLinearGradient(0, pad, 0, h);
+  g2.addColorStop(0,'rgba(34,211,166,.45)'); g2.addColorStop(1,'rgba(34,211,166,0)');
+  ctx.fillStyle = g2; ctx.fill();
+  ctx.beginPath();
+  series.forEach((v,i) => i ? ctx.lineTo(xAt(i), yAt(v)) : ctx.moveTo(xAt(i), yAt(v)));
+  ctx.strokeStyle = '#22d3a6'; ctx.lineWidth = 2.5; ctx.stroke();
+  series.forEach((v,i) => {
+    ctx.beginPath(); ctx.arc(xAt(i), yAt(v), 3, 0, Math.PI*2); ctx.fillStyle='#ffb703'; ctx.fill();
+  });
+  ctx.fillStyle = css('--muted'); ctx.font='11px system-ui';
+  ctx.fillText(money(max), 2, pad-10);
+  [0,5,11].forEach(i => ctx.fillText('M'+(i+1), xAt(i)-6, h-6));
+}
+
+/* ---------- Methods ---------- */
+function renderMethods(){
+  const grid = document.getElementById('methodGrid');
+  grid.innerHTML = METHODS.map(m => {
+    const active = S.stack.includes(m.id);
+    return '<div class="method">' +
+      '<div class="mtop"><div class="ico">' + m.icon + '</div><div><div class="tag">' + m.tag + '</div><h4>' + m.name + '</h4></div></div>' +
+      '<p>' + m.blurb + '</p>' +
+      '<div class="meta">' +
+        '<div><span>Time to first ₹</span><b>' + m.first + '</b></div>' +
+        '<div><span>Realistic daily</span><b>' + m.daily + '</b></div>' +
+        '<div><span>Startup cost</span><b>₹0</b></div>' +
+        '<div><span>Difficulty</span><b>' + m.difficulty + '</b></div>' +
+      '</div>' +
+      '<div class="chips">' + m.platforms.map(p => '<span class="chip">' + p + '</span>').join('') + '</div>' +
+      '<details class="steps"><summary>How to start in 5 steps</summary><ol>' + m.steps.map(s => '<li>' + s + '</li>').join('') + '</ol></details>' +
+      '<div class="row" style="margin-top:auto"><button class="btn sm ' + (active?'':'primary') + '" data-add="' + m.id + '">' + (active ? '✓ In your stack' : '+ Add to stack') + '</button>' +
+      '<span class="pill">' + m.speed + '</span></div>' +
+    '</div>';
+  }).join('');
+  grid.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.add;
+    if(S.stack.includes(id)){ S.stack = S.stack.filter(x => x !== id); toast('Removed from your stack'); }
+    else { if(S.stack.length >= 4){ toast('Focus: max 4 methods. Remove one first.'); return; } S.stack.push(id); toast('Added to your stack'); }
+    save(); renderMethods(); renderStack(); renderDash();
+  }));
+}
+
+function renderStack(){
+  const box = document.getElementById('stackChips');
+  box.innerHTML = S.stack.length
+    ? S.stack.map(id => {
+        const m = methodById(id);
+        return '<span class="pill" style="cursor:pointer" data-remove="' + id + '">' + m.icon + ' ' + m.name + ' ✕</span>';
+      }).join('')
+    : '<span class="note">No methods selected yet — add at least one below.</span>';
+  box.querySelectorAll('[data-remove]').forEach(el => el.addEventListener('click', () => {
+    S.stack = S.stack.filter(x => x !== el.dataset.remove);
+    save(); renderStack(); renderMethods(); renderDash();
+  }));
+
+  const sel = document.getElementById('methodSelect');
+  sel.innerHTML = METHODS.filter(m => !S.stack.includes(m.id))
+    .map(m => '<option value="' + m.id + '">' + m.icon + ' ' + m.name + '</option>').join('') || '<option value="">All methods added</option>';
+
+  const lm = document.getElementById('logMethod');
+  lm.innerHTML = METHODS.map(m => '<option value="' + m.id + '">' + m.icon + ' ' + m.name + '</option>').join('');
+
+  const fm = document.getElementById('filterMethod');
+  fm.innerHTML = '<option value="">All methods</option>' + METHODS.map(m => '<option value="' + m.id + '">' + m.name + '</option>').join('');
+}
+
+/* ---------- Daily plan ---------- */
+function buildPlan(seedOffset){
+  const mins = Math.max(10, Number(document.getElementById('minutesInput').value) || 60);
+  const count = Math.max(3, Math.min(7, Math.round(mins/15)));
+  const seedStr = todayISO() + '|' + S.stack.join(',') + '|' + (seedOffset||0);
+  const rnd = seeded(seedStr);
+  const tasks = [];
+  const pool = [];
+  S.stack.forEach(id => {
+    const m = methodById(id);
+    m.actions.forEach(a => pool.push({ method:id, text:a }));
+  });
+  if(!pool.length) return [];
+  // shuffle deterministically
+  const arr = pool.slice();
+  for(let i=arr.length-1;i>0;i--){ const j = Math.floor(rnd()*(i+1)); [arr[i],arr[j]] = [arr[j],arr[i]]; }
+  // round-robin so every selected method appears at least once
+  const byM = {};
+  arr.forEach(t => { (byM[t.method] = byM[t.method] || []).push(t); });
+  const order = S.stack.slice();
+  let i = 0;
+  while(tasks.length < count && i < 20){
+    let added = false;
+    for(const m of order){
+      if(byM[m] && byM[m].length){
+        tasks.push({ ...byM[m].shift(), done:false });
+        added = true;
+        if(tasks.length >= count) break;
+      }
+    }
+    if(!added) break;
+    i++;
+  }
+  return tasks;
+}
+
+function renderPlan(){
+  const t = todayISO();
+  if(S.plan.date !== t || !S.plan.tasks.length) {
+    S.plan = { date:t, tasks: buildPlan(0) };
+    save();
+  }
+  const tasks = S.plan.tasks;
+  const done = tasks.filter(x => x.done).length;
+  const pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
+  document.getElementById('planPct').textContent = pct + '%';
+  document.getElementById('planBar').style.width = pct + '%';
+  document.getElementById('planDate').textContent = 'Actions for ' + new Date(t+'T00:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'short' });
+  document.getElementById('planSub').textContent = tasks.length
+    ? done + ' of ' + tasks.length + ' complete · finish 60% to keep your streak alive'
+    : 'Add at least one method to your stack, then generate.';
+  const list = document.getElementById('taskList');
+  list.innerHTML = tasks.length ? tasks.map((task,i) =>
+    '<div class="task ' + (task.done?'done':'') + '" data-i="' + i + '">' +
+      '<button class="checkbox" data-toggle="' + i + '">' + (task.done?'✓':'') + '</button>' +
+      '<div><div class="t-tag">' + methodById(task.method).icon + ' ' + methodById(task.method).name + '</div>' +
+      '<div class="t-txt">' + task.text + '</div></div>' +
+    '</div>').join('')
+    : '<p class="note">No actions yet. Add a method above and hit <b>Generate plan</b>.</p>';
+  list.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => {
+    const i = Number(b.dataset.toggle);
+    S.plan.tasks[i].done = !S.plan.tasks[i].done;
+    save(); renderPlan(); evaluateStreak();
+  }));
+}
+
+function evaluateStreak(){
+  const tasks = S.plan.tasks;
+  const ratio = tasks.length ? tasks.filter(t=>t.done).length / tasks.length : 0;
+  const t = todayISO();
+  if(ratio >= 0.6){
+    S.activeDays[t] = true;
+    if(S.streak.last !== t){
+      const yesterday = dateAddDays(t, -1);
+      S.streak.count = (S.streak.last === yesterday) ? (S.streak.count||0) + 1 : 1;
+      S.streak.last = t;
+      S.streak.best = Math.max(S.streak.best||0, S.streak.count);
+    }
+  } else {
+    delete S.activeDays[t];
+    if(S.streak.last === t){ S.streak.count = Math.max(0,(S.streak.count||1)-1); S.streak.last = null; }
+  }
+  save(); renderDash();
+}
+
+/* ---------- Tracker ---------- */
+function renderLogs(){
+  const filter = document.getElementById('filterMethod').value;
+  const rows = [...S.logs].filter(l => !filter || l.method === filter).sort((a,b)=> a.date < b.date ? 1 : -1);
+  document.getElementById('logCount').textContent = rows.length + ' entries · ' + money(rows.reduce((a,l)=>a+Number(l.amount||0),0)) + ' total';
+  const t = document.getElementById('logTable');
+  t.innerHTML = rows.length
+    ? '<thead><tr><th>Date</th><th>Method</th><th>Note</th><th class="num">Amount</th><th></th></tr></thead><tbody>' +
+      rows.map(l => '<tr><td>' + l.date + '</td><td>' + methodById(l.method).icon + ' ' + methodById(l.method).name +
+        '</td><td style="color:var(--muted)">' + (l.note||'—') + '</td><td class="num"><b>' + money(l.amount) +
+        '</b></td><td class="num"><button class="btn sm ghost" data-del="' + l.id + '">✕</button></td></tr>').join('') + '</tbody>'
+    : '<tr><td class="note">Nothing logged yet.</td></tr>';
+  t.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    S.logs = S.logs.filter(l => l.id !== b.dataset.del);
+    save(); renderLogs(); renderDash(); toast('Entry removed');
+  }));
+
+  const byMonth = {};
+  S.logs.forEach(l => { const k = monthKey(l.date); byMonth[k] = (byMonth[k]||0) + Number(l.amount||0); });
+  const mt = document.getElementById('monthTable');
+  mt.innerHTML = Object.keys(byMonth).sort((a,b)=> a<b?1:-1).length
+    ? '<thead><tr><th>Month</th><th class="num">Earned</th><th class="num">vs goal</th></tr></thead><tbody>' +
+      Object.entries(byMonth).sort((a,b)=> a[0]<b[0]?1:-1).map(([k,v]) => {
+        const pct = S.goal ? Math.round(v/S.goal*100) : 0;
+        return '<tr><td>' + k + '</td><td class="num"><b>' + money(v) + '</b></td><td class="num"><span class="pill ' + (pct>=100?'good':pct>=50?'warn':'bad') + '">' + pct + '%</span></td></tr>';
+      }).join('') + '</tbody>'
+    : '<tr><td class="note">No data yet.</td></tr>';
+}
+
+/* ---------- Projection ---------- */
+function calculate(){
+  const hrs = Number(document.getElementById('cHours').value) || 0;
+  const rate = Number(document.getElementById('cRate').value) || 0;
+  const growth = (Number(document.getElementById('cGrowth').value) || 0) / 100;
+  const days = Number(document.getElementById('cDays').value) || 26;
+  const series = [];
+  let r = rate;
+  for(let m=1;m<=12;m++){
+    series.push(Math.round(hrs * r * days));
+    r = r * (1 + growth);
+  }
+  document.getElementById('cM1').textContent = money(series[0]);
+  document.getElementById('cM3').textContent = money(series[2]);
+  document.getElementById('cM12').textContent = money(series[11]);
+  drawProjection(series);
+  const total = series.reduce((a,b)=>a+b,0);
+  document.getElementById('calcVerdict').innerHTML =
+    'Year-one total: <b>' + money(total) + '</b>. Month 12 is <b>' + (series[0] ? (series[11]/series[0]).toFixed(1) : '0') +
+    '×</b> month 1 — all of it from a rising rate, not more hours. Even at ' + hrs + ' h/day, the lever that matters is what an hour of your work is worth.';
+}
+
+/* ---------- Launch checklist & scams ---------- */
+function renderLaunch(){
+  const ul = document.getElementById('launchList');
+  ul.innerHTML = LAUNCH.map((t,i) =>
+    '<li style="list-style:none;display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">' +
+      '<button class="checkbox" data-launch="' + i + '" style="' + (S.launch[i] ? 'background:var(--accent-2);border-color:var(--accent-2);color:#04231b' : '') + '">' + (S.launch[i]?'✓':'') + '</button>' +
+      '<span style="' + (S.launch[i] ? 'text-decoration:line-through;opacity:.55' : '') + '">' + t + '</span>' +
+    '</li>').join('');
+  ul.querySelectorAll('[data-launch]').forEach(b => b.addEventListener('click', () => {
+    const i = Number(b.dataset.launch);
+    S.launch[i] = !S.launch[i];
+    save(); renderLaunch();
+  }));
+}
+
+function renderScams(){
+  const g = document.getElementById('scamGrid');
+  g.innerHTML = SCAMS.map(([title, desc, action]) =>
+    '<div class="card" style="border-color:color-mix(in srgb,var(--danger) 25%,var(--line))">' +
+      '<div class="row" style="justify-content:space-between"><h3 style="margin:0">⚠ ' + title + '</h3><span class="pill bad">Avoid</span></div>' +
+      '<p style="color:var(--muted);font-size:13.5px;margin:8px 0 10px">' + desc + '</p>' +
+      '<div style="font-size:13px"><b>Do this:</b> ' + action + '</div>' +
+    '</div>').join('');
+}
+
+/* ---------- Tabs & events ---------- */
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  if(name === 'dash'){ renderDash(); }
+  if(name === 'plan'){ renderPlan(); }
+  if(name === 'tracker'){ renderLogs(); }
+  if(name === 'calc'){ calculate(); }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', S.theme === 'light' ? 'light' : 'dark');
+}
+
+function renderAll(){
+  applyTheme();
+  renderHeroStats();
+  renderDash();
+  renderStack();
+  renderMethods();
+  renderPlan();
+  renderLogs();
+  renderLaunch();
+  renderScams();
+  document.getElementById('minutesInput').value = S.minutes || 60;
+  document.getElementById('logDate').value = todayISO();
+  if(!store.persistent){
+    document.getElementById('storageNote').innerHTML =
+      '⚠ <b>Live preview mode:</b> this browser blocked local storage, so data lasts only until you reload. ' +
+      'Download the file and open it normally to keep your data forever.';
+  } else {
+    document.getElementById('storageNote').textContent = 'Saved automatically on this device. Nothing is uploaded anywhere.';
+  }
+}
+
+/* Events */
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(b) showView(b.dataset.view);
+});
+document.getElementById('themeBtn').addEventListener('click', () => {
+  S.theme = S.theme === 'light' ? 'dark' : 'light'; save(); applyTheme(); renderDash(); calculate();
+});
+document.getElementById('ctaPlan').addEventListener('click', () => showView('plan'));
+document.getElementById('ctaMethods').addEventListener('click', () => showView('methods'));
+document.getElementById('ctaLog').addEventListener('click', () => {
+  showView('tracker'); setTimeout(()=>document.getElementById('logAmt').focus(), 350);
+});
+document.getElementById('goalInput').addEventListener('change', e => {
+  S.goal = Math.max(0, Number(e.target.value) || 0); save(); renderDash(); toast('Goal updated');
+});
+document.getElementById('genBtn').addEventListener('click', () => {
+  if(!S.stack.length){ toast('Pick at least one method first'); return; }
+  S.minutes = Number(document.getElementById('minutesInput').value) || 60;
+  S.plan = { date: todayISO(), tasks: buildPlan(0) };
+  save(); renderPlan(); toast('Fresh plan generated');
+});
+document.getElementById('regenBtn').addEventListener('click', () => {
+  if(!S.stack.length){ toast('Pick at least one method first'); return; }
+  S.plan = { date: todayISO(), tasks: buildPlan(Date.now() % 9973) };
+  save(); renderPlan();
+});
+document.getElementById('allDoneBtn').addEventListener('click', () => {
+  S.plan.tasks.forEach(t => t.done = true);
+  save(); renderPlan(); evaluateStreak(); toast('Day complete — streak updated 🔥');
+});
+document.getElementById('clearPlanBtn').addEventListener('click', () => {
+  S.plan = { date: todayISO(), tasks: buildPlan(0) };
+  save(); renderPlan(); toast('Today reset');
+});
+document.getElementById('minutesInput').addEventListener('change', e => { S.minutes = Number(e.target.value)||60; save(); });
+document.getElementById('addLogBtn').addEventListener('click', () => {
+  const date = document.getElementById('logDate').value || todayISO();
+  const amount = Number(document.getElementById('logAmt').value);
+  const method = document.getElementById('logMethod').value;
+  const note = document.getElementById('logNote').value.trim();
+  if(!amount || amount <= 0){ toast('Enter an amount first'); return; }
+  S.logs.push({ id: uid(), date, amount, method, note });
+  S.activeDays[date] = true;
+  save();
+  document.getElementById('logAmt').value = ''; document.getElementById('logNote').value = '';
+  renderLogs(); renderDash(); renderHeroStats();
+  toast('Logged ' + money(amount) + ' 💰');
+});
+document.getElementById('filterMethod').addEventListener('change', renderLogs);
+document.getElementById('calcBtn').addEventListener('click', calculate);
+['cHours','cRate','cGrowth','cDays'].forEach(id => document.getElementById(id).addEventListener('change', calculate));
+document.getElementById('resetCalcBtn').addEventListener('click', () => {
+  document.getElementById('cHours').value = 2;
+  document.getElementById('cRate').value = 250;
+  document.getElementById('cGrowth').value = 20;
+  document.getElementById('cDays').value = 26;
+  calculate();
+});
+document.getElementById('csvBtn').addEventListener('click', () => {
+  const head = 'Date,Method,Note,Amount\n';
+  const body = S.logs.map(l => [l.date, methodById(l.method).name, '"' + (l.note||'').replace(/"/g,'') + '"', l.amount].join(',')).join('\n');
+  const blob = new Blob([head + body], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'earnings.csv'; a.click();
+  toast('CSV downloaded');
+});
+document.getElementById('wipeBtn').addEventListener('click', () => {
+  if(!confirm('Delete all logs, streak and settings? This cannot be undone.')) return;
+  S = defaultState(); save(); renderAll(); toast('All data cleared');
+});
+document.getElementById('seedBtn').addEventListener('click', () => {
+  const ids = ['freelance','local','aiservices','resell'];
+  const rnd = seeded('demo-seed');
+  for(let i=45;i>=0;i--){
+    const d = dateAddDays(todayISO(), -i);
+    if(rnd() > 0.45){
+      const n = 1 + Math.floor(rnd()*2);
+      for(let k=0;k<n;k++){
+        const m = ids[Math.floor(rnd()*ids.length)];
+        const base = m === 'freelance' ? 900 : m === 'local' ? 600 : m === 'aiservices' ? 1500 : 350;
+        S.logs.push({ id: uid(), date: d, amount: Math.round((base * (0.5 + rnd()*1.4)) / 10) * 10, method: m, note: 'Sample entry' });
+      }
+      S.activeDays[d] = true;
+    }
+  }
+  S.streak = { count: 12, last: todayISO(), best: 12 };
+  if(!S.stack.length) S.stack = ['freelance','local'];
+  save(); renderAll(); toast('Sample data loaded — clear it any time');
+});
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'daily-earner-backup.json'; a.click();
+  toast('Backup downloaded');
+});
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try { S = Object.assign(defaultState(), JSON.parse(r.result)); save(); renderAll(); toast('Data restored'); }
+    catch(err){ toast('That file could not be read'); }
+  };
+  r.readAsText(f);
+});
+window.addEventListener('resize', () => { draw30(); drawPie(); calculate(); });
+setInterval(renderTruth, 9000);
+
+/* Boot */
+renderTruth();
+renderAll();
+</script>
+</body>
+</html>
